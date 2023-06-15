@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #cambox {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 320px;
+      height: 240px;
+      background-color: #000;
+      border: 2px solid #fff;
+      overflow: hidden;
+    }
+
+    #cambox canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="cambox"></div>
+
+  <script>
+    // Rainbow line animation
+    var canvas = document.createElement("canvas");
+    var context = canvas.getContext("2d");
+    var lines = [];
+    var lineCount = 100;
+    var lineWidth = 2;
+    var speed = 2;
+    var colors = ["#ff0000", "#ff7f00", "#ffff00", "#00ff00", "#0000ff", "#8b00ff"];
+
+    function Line(x, y, color) {
+      this.x = x;
+      this.y = y;
+      this.color = color;
+    }
+
+    function createLines() {
+      for (var i = 0; i < lineCount; i++) {
+        var x = Math.random() * canvas.width;
+        var y = Math.random() * canvas.height;
+        var color = colors[Math.floor(Math.random() * colors.length)];
+        lines.push(new Line(x, y, color));
+      }
+    }
+
+    function updateLines() {
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        line.x += speed;
+        if (line.x > canvas.width + lineWidth) {
+          line.x = -lineWidth;
+        }
+      }
+    }
+
+    function drawLines() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.lineWidth = lineWidth;
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        context.beginPath();
+        context.moveTo(line.x, line.y);
+        context.lineTo(line.x + canvas.width, line.y);
+        context.strokeStyle = line.color;
+        context.stroke();
+      }
+    }
+
+    function animate() {
+      updateLines();
+      drawLines();
+      requestAnimationFrame(animate);
+    }
+
+    // Twitch Embed SDK script
+    var script = document.createElement("script");
+    script.src = "https://embed.twitch.tv/embed/v1.js";
+    script.onload = function() {
+      var options = {
+        width: 320,
+        height: 240,
+        channel: "cnekcapalott",
+      };
+      var player = new Twitch.Player("cambox", options);
+      player.setVolume(0.5); // Optional: Set volume (0.0 to 1.0)
+
+      // Append the canvas and start the animation
+      canvas.width = options.width;
+      canvas.height = options.height;
+      document.getElementById("cambox").appendChild(canvas);
+      createLines();
+      animate();
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
